@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+
+/src/generated/prisma
