@@ -1,3 +1,5 @@
+import Footer from "@/components/main/footer";
+import Navbar from "@/components/main/navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
@@ -12,7 +14,9 @@ export const Route = createRootRoute({
 function RootComponent() {
     return (
         <>
+            <Navbar />
             <Outlet />
+            <Footer />
             <Toaster />
             <TanStackDevtools
                 config={{

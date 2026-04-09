@@ -10,38 +10,30 @@ export const Route = createFileRoute("/__auth/signup")({
 });
 
 const signupSchema = z.object({
-    firstName: z.string().min(2, "Provide your first name"),
-    lastName: z.string().min(2, "Provide your last name"),
+    name: z.string().min(2, "Provide your full name"),
     email: z.email("Provide a valid email address"),
     password: z.string().min(6, "Password must be at least 6 characters").max(32, "Password must be at most 32 characters"),
 });
 
 function RouteComponent() {
     return (
-        <>
-            <div className="flex flex-1 items-center justify-center">
-                <div className="w-full max-w-xs flex flex-col gap-6">
-                    <div className="flex flex-col items-center gap-2 text-center">
-                        <h1 className="text-2xl font-bold">Create an account</h1>
-                        <p className="text-muted-foreground text-balance">Please enter your details to get started</p>
-                    </div>
-                    <Tabs defaultValue="employer">
-                        <TabsList>
-                            <TabsTrigger value="employer">Employer</TabsTrigger>
-                            <TabsTrigger value="candidate">Candidate</TabsTrigger>
-                        </TabsList>
-                        <SignUpForm role="employer" />
-                        <SignUpForm role="candidate" />
-                    </Tabs>
-                </div>
-            </div>
-            <p className="text-center text-muted-foreground">
+        <div className="w-full max-w-xl mx-auto my-16 p-8 bg-card border rounded-lg">
+            <h1 className="text-2xl text-center font-semibold">Sign Up</h1>
+            <Tabs defaultValue="employer" className="mt-6">
+                <TabsList>
+                    <TabsTrigger value="employer">Employer</TabsTrigger>
+                    <TabsTrigger value="candidate">Candidate</TabsTrigger>
+                </TabsList>
+                <SignUpForm role="employer" />
+                <SignUpForm role="candidate" />
+            </Tabs>
+            <p className="mt-6 text-sm text-center text-muted-foreground">
                 Already have an account?{" "}
                 <Link to="/signin" className="text-primary underline">
                     Sign in
                 </Link>
             </p>
-        </>
+        </div>
     );
 }
 
@@ -49,14 +41,14 @@ function SignUpForm({ role }: { role: "employer" | "candidate" }) {
     const navigate = Route.useNavigate();
 
     const form = useAppForm({
-        defaultValues: { firstName: "", lastName: "", email: "", password: "" },
+        defaultValues: { name: "", email: "", password: "" },
         validators: {
             onChange: signupSchema,
         },
         onSubmit: async ({ value }) => {
             await auth.signUp.email(
                 {
-                    name: `${value.firstName} ${value.lastName}`,
+                    name: value.name,
                     email: value.email,
                     role,
                     password: value.password,
@@ -77,20 +69,26 @@ function SignUpForm({ role }: { role: "employer" | "candidate" }) {
     return (
         <TabsContent value={role}>
             <form
-                className="grid gap-4"
+                className="grid gap-6"
                 onSubmit={(e) => {
                     e.preventDefault();
                     form.handleSubmit();
                 }}
             >
-                <div className="grid grid-cols-2 gap-4">
-                    <form.AppField name="firstName" children={(field) => <field.FormInput type="text" label="First Name" />} />
-                    <form.AppField name="lastName" children={(field) => <field.FormInput type="text" label="Last Name" />} />
-                </div>
-                <form.AppField name="email" children={(field) => <field.FormInput type="email" label="Email" />} />
-                <form.AppField name="password" children={(field) => <field.FormInput type="password" label="Password" />} />
+                <form.AppField
+                    name="name"
+                    children={(field) => <field.FormInput type="text" label="Full Name" placeholder="Enter your full name" />}
+                />
+                <form.AppField
+                    name="email"
+                    children={(field) => <field.FormInput type="email" label="Email" placeholder="Enter your email" />}
+                />
+                <form.AppField
+                    name="password"
+                    children={(field) => <field.FormInput type="password" label="Password" placeholder="Enter your password" />}
+                />
                 <form.AppForm>
-                    <form.FormSubmit label="Sign Up" />
+                    <form.FormSubmit label="Sign Up" className="mt-2" />
                 </form.AppForm>
             </form>
         </TabsContent>
