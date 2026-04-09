@@ -1,6 +1,8 @@
 import { useAppForm } from "@/components/form/form-context";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import * as z from "zod";
 
 export const Route = createFileRoute("/__auth/signin")({
@@ -20,7 +22,16 @@ function RouteComponent() {
         validators: {
             onChange: signinSchema,
         },
-        onSubmit: async ({ value }) => {},
+        onSubmit: async ({ value }) => {
+            await auth.signIn.email(value, {
+                onSuccess: () => {
+                    navigate({ to: "/" });
+                },
+                onError: ({ error }) => {
+                    toast.error(error.message);
+                },
+            });
+        },
     });
 
     return (

@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.get("/favicon.ico", (_req, res) => res.status(204).end());
 
 // API Routes
-app.use("/api/v1", apiRoutes);
+app.use("/api", apiRoutes);
 
 // Handle 404
 app.use(notFoundHandler);

@@ -1,3 +1,4 @@
+import { authRoutes } from "@/features/auth/auth.routes";
 import { Router } from "express";
 
 const router = Router();
@@ -12,5 +13,6 @@ router.get("/health", (_req, res) => {
 });
 
 // Feature routes
+router.use("/auth", authRoutes);
 
 export { router as apiRoutes };
