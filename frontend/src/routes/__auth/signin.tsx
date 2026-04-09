@@ -34,10 +34,10 @@ function RouteComponent() {
     });
 
     return (
-        <div className="w-full max-w-xl mx-auto my-16 p-8 bg-card border rounded-lg">
+        <div className="w-full max-w-xl mx-auto my-14 p-6 bg-card border rounded-lg">
             <h1 className="text-2xl text-center font-semibold">Sign In</h1>
             <form
-                className="mt-6 grid gap-6"
+                className="mt-6 grid gap-4"
                 onSubmit={(e) => {
                     e.preventDefault();
                     form.handleSubmit();

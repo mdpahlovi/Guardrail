@@ -17,7 +17,7 @@ const signupSchema = z.object({
 
 function RouteComponent() {
     return (
-        <div className="w-full max-w-xl mx-auto my-16 p-8 bg-card border rounded-lg">
+        <div className="w-full max-w-xl mx-auto my-14 p-6 bg-card border rounded-lg">
             <h1 className="text-2xl text-center font-semibold">Sign Up</h1>
             <Tabs defaultValue="employer" className="mt-6">
                 <TabsList>
@@ -69,7 +69,7 @@ function SignUpForm({ role }: { role: "employer" | "candidate" }) {
     return (
         <TabsContent value={role}>
             <form
-                className="grid gap-6"
+                className="grid gap-4"
                 onSubmit={(e) => {
                     e.preventDefault();
                     form.handleSubmit();
