@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, FileText, Users } from "lucide-react";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/__main/")({
     component: RouteComponent,
 });
 

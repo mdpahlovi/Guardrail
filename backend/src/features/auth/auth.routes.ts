@@ -4,6 +4,6 @@ import { Router } from "express";
 
 const router = Router();
 
-router.all("/*", toNodeHandler(auth));
+router.all("/{*any}", toNodeHandler(auth));
 
 export const authRoutes = router;

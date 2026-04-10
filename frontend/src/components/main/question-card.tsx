@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Question } from "@/routes/create-test";
+import type { Question } from "@/routes/__main/create-test";
 import { Pencil, Trash2 } from "lucide-react";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E", "F"];

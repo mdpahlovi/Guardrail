@@ -10,7 +10,7 @@ export const Route = createFileRoute("/__auth/signin")({
 
 const signinSchema = z.object({
     email: z.email("Provide a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters").max(32, "Password must be at most 32 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password must be at most 32 characters"),
 });
 
 function RouteComponent() {

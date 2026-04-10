@@ -9,25 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CreateTestRouteImport } from './routes/create-test'
+import { Route as _mainRouteRouteImport } from './routes/__main/route'
 import { Route as _authRouteRouteImport } from './routes/__auth/route'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as _mainIndexRouteImport } from './routes/__main/index'
+import { Route as _mainCreateTestRouteImport } from './routes/__main/create-test'
 import { Route as _authSignupRouteImport } from './routes/__auth/signup'
 import { Route as _authSigninRouteImport } from './routes/__auth/signin'
 
-const CreateTestRoute = CreateTestRouteImport.update({
-  id: '/create-test',
-  path: '/create-test',
+const _mainRouteRoute = _mainRouteRouteImport.update({
+  id: '/__main',
   getParentRoute: () => rootRouteImport,
 } as any)
 const _authRouteRoute = _authRouteRouteImport.update({
   id: '/__auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const _mainIndexRoute = _mainIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => _mainRouteRoute,
+} as any)
+const _mainCreateTestRoute = _mainCreateTestRouteImport.update({
+  id: '/create-test',
+  path: '/create-test',
+  getParentRoute: () => _mainRouteRoute,
 } as any)
 const _authSignupRoute = _authSignupRouteImport.update({
   id: '/signup',
@@ -41,52 +46,53 @@ const _authSigninRoute = _authSigninRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/create-test': typeof CreateTestRoute
+  '/': typeof _mainIndexRoute
   '/signin': typeof _authSigninRoute
   '/signup': typeof _authSignupRoute
+  '/create-test': typeof _mainCreateTestRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/create-test': typeof CreateTestRoute
+  '/': typeof _mainIndexRoute
   '/signin': typeof _authSigninRoute
   '/signup': typeof _authSignupRoute
+  '/create-test': typeof _mainCreateTestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/__auth': typeof _authRouteRouteWithChildren
-  '/create-test': typeof CreateTestRoute
+  '/__main': typeof _mainRouteRouteWithChildren
   '/__auth/signin': typeof _authSigninRoute
   '/__auth/signup': typeof _authSignupRoute
+  '/__main/create-test': typeof _mainCreateTestRoute
+  '/__main/': typeof _mainIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create-test' | '/signin' | '/signup'
+  fullPaths: '/' | '/signin' | '/signup' | '/create-test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create-test' | '/signin' | '/signup'
+  to: '/' | '/signin' | '/signup' | '/create-test'
   id:
     | '__root__'
-    | '/'
     | '/__auth'
-    | '/create-test'
+    | '/__main'
     | '/__auth/signin'
     | '/__auth/signup'
+    | '/__main/create-test'
+    | '/__main/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   _authRouteRoute: typeof _authRouteRouteWithChildren
-  CreateTestRoute: typeof CreateTestRoute
+  _mainRouteRoute: typeof _mainRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/create-test': {
-      id: '/create-test'
-      path: '/create-test'
-      fullPath: '/create-test'
-      preLoaderRoute: typeof CreateTestRouteImport
+    '/__main': {
+      id: '/__main'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof _mainRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/__auth': {
@@ -96,12 +102,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _authRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/__main/': {
+      id: '/__main/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof _mainIndexRouteImport
+      parentRoute: typeof _mainRouteRoute
+    }
+    '/__main/create-test': {
+      id: '/__main/create-test'
+      path: '/create-test'
+      fullPath: '/create-test'
+      preLoaderRoute: typeof _mainCreateTestRouteImport
+      parentRoute: typeof _mainRouteRoute
     }
     '/__auth/signup': {
       id: '/__auth/signup'
@@ -134,10 +147,23 @@ const _authRouteRouteWithChildren = _authRouteRoute._addFileChildren(
   _authRouteRouteChildren,
 )
 
+interface _mainRouteRouteChildren {
+  _mainCreateTestRoute: typeof _mainCreateTestRoute
+  _mainIndexRoute: typeof _mainIndexRoute
+}
+
+const _mainRouteRouteChildren: _mainRouteRouteChildren = {
+  _mainCreateTestRoute: _mainCreateTestRoute,
+  _mainIndexRoute: _mainIndexRoute,
+}
+
+const _mainRouteRouteWithChildren = _mainRouteRoute._addFileChildren(
+  _mainRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   _authRouteRoute: _authRouteRouteWithChildren,
-  CreateTestRoute: CreateTestRoute,
+  _mainRouteRoute: _mainRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

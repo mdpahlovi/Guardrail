@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type { Question, QuestionType } from "@/routes/create-test";
+import type { Question, QuestionType } from "@/routes/__main/create-test";
 import { Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 

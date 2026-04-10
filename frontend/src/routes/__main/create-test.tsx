@@ -9,7 +9,7 @@ import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
-export const Route = createFileRoute("/create-test")({
+export const Route = createFileRoute("/__main/create-test")({
     component: RouteComponent,
 });
 
