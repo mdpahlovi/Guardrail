@@ -8,6 +8,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { createTestFn } from "@/api/test";
 
 export const Route = createFileRoute("/__main/create-test")({
     component: RouteComponent,
@@ -19,7 +21,7 @@ const basicInfoSchema = z
     .object({
         title: z.string().min(1, "Test title is required"),
         totalCandidates: z.coerce.number().int().positive("Must be positive"),
-        totalSets: z.coerce.number().int().positive("Must be positive"),
+        totalSlots: z.coerce.number().int().positive("Must be positive"),
         questionSet: z.coerce.number().int().positive("Must be positive"),
         questionType: z.enum(["mcq", "essay", "mixed"], { error: "Select a question type" }),
         startTime: z.string().min(1, "Start time is required"),
@@ -31,9 +33,7 @@ const basicInfoSchema = z
         path: ["endTime"],
     });
 
-type BasicInfoValues = z.infer<typeof basicInfoSchema>;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+export type BasicInfoValues = z.infer<typeof basicInfoSchema>;
 
 export type QuestionType = "text" | "radio" | "checkbox";
 
@@ -47,29 +47,22 @@ export type Question = {
     type: QuestionType;
     marks: number;
     questionText: string;
-    answerText: string; // used when type === "text"
+    answerText: string;
     options: Option[];
-    correctAnswers: string[]; // option ids
+    correctAnswers: string[];
     isEditing?: boolean;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-let _counter = 0;
-const uid = () => `${Date.now()}-${++_counter}`;
-
 function newQuestion(type: QuestionType): Question {
     return {
-        id: uid(),
+        id: crypto.randomUUID(),
         type,
         marks: 1,
         questionText: "",
         answerText: "",
-        options: [
-            { id: uid(), text: "" },
-            { id: uid(), text: "" },
-            { id: uid(), text: "" },
-        ],
+        options: [],
         correctAnswers: [],
     };
 }
@@ -89,7 +82,7 @@ function BasicInfoSummary({ values, onEdit }: { values: BasicInfoValues; onEdit:
                     [
                         ["Online Test Title", values.title],
                         ["Total Candidates", values.totalCandidates],
-                        ["Total Slots", values.totalSets],
+                        ["Total Slots", values.totalSlots],
                         ["Total Question Set", values.questionSet],
                         ["Duration Per Slots (Minutes)", values.duration],
                         ["Question Type", String(values.questionType)],
@@ -116,14 +109,14 @@ function RouteComponent() {
 
     const basicForm = useAppForm({
         defaultValues: {
-            title: "tttt",
-            totalCandidates: 10,
-            totalSets: 10,
-            questionSet: 10,
-            questionType: "mcq" as "mcq" | "essay" | "mixed",
-            startTime: "2026-04-10T10:00",
-            endTime: "2026-04-10T11:00",
-            duration: 60,
+            title: "",
+            totalCandidates: 0,
+            totalSlots: 0,
+            questionSet: 0,
+            questionType: "" as "mcq" | "essay" | "mixed",
+            startTime: "",
+            endTime: "",
+            duration: 0,
         },
         validators: { onChange: basicInfoSchema },
         onSubmit: ({ value }) => {
@@ -164,10 +157,24 @@ function RouteComponent() {
 
     const removeQuestion = (id: string) => setQuestions((prev) => prev.filter((x) => x.id !== id));
 
+    const createTestMutation = useMutation({
+        mutationFn: createTestFn,
+        onSuccess: () => {
+            alert("Test saved successfully!");
+            navigate({ to: "/" });
+        },
+        onError: (error) => {
+            alert("Failed to save test. Please check your data.");
+            console.error("Save Test Error:", error);
+        },
+    });
+
     const handleSaveTest = () => {
-        // TODO: submit to API
-        alert("Test saved successfully!");
-        navigate({ to: "/" });
+        if (!savedBasicInfo) return;
+        createTestMutation.mutate({
+            ...savedBasicInfo,
+            questions,
+        });
     };
 
     // dialog index (for the "Question N" header)
@@ -213,9 +220,9 @@ function RouteComponent() {
                                     )}
                                 />
                                 <basicForm.AppField
-                                    name="totalSets"
+                                    name="totalSlots"
                                     children={(field) => (
-                                        <field.FormInput type="number" label="Total Sets" placeholder="Enter total sets" />
+                                        <field.FormInput type="number" label="Total Slots" placeholder="Enter total slots" />
                                     )}
                                 />
                             </div>
@@ -305,6 +312,7 @@ function RouteComponent() {
             {/* ── Question Dialog ── */}
             {dialogQuestion && (
                 <QuestionDialog
+                    key={dialogQuestion.id}
                     question={dialogQuestion}
                     questionNumber={dialogNumber}
                     onSave={handleSave}

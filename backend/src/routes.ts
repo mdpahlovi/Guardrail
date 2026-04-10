@@ -1,4 +1,5 @@
 import { authRoutes } from "@/features/auth/auth.routes";
+import { testRoutes } from "@/features/test/test.route";
 import { Router } from "express";
 
 const router = Router();
@@ -14,5 +15,6 @@ router.get("/health", (_req, res) => {
 
 // Feature routes
 router.use("/auth", authRoutes);
+router.use("/test", testRoutes);
 
 export { router as apiRoutes };

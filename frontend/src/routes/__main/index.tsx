@@ -1,24 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios, { type AxiosResponse } from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, FileText, Users } from "lucide-react";
 
 export const Route = createFileRoute("/__main/")({
     component: RouteComponent,
 });
-
-const tests = [
-    { id: 1, title: "Psychometric Test for Management Trainee Officer", candidates: "10,000", questionSet: "3", examSlots: "3" },
-    { id: 2, title: "Psychometric Test for Management Trainee Officer", candidates: "10,000", questionSet: "3", examSlots: "3" },
-    {
-        id: 3,
-        title: "Psychometric Test for Management Trainee Officer",
-        candidates: "Not Set",
-        questionSet: "Not Set",
-        examSlots: "Not Set",
-    },
-    { id: 4, title: "Psychometric Test for Management Trainee Officer", candidates: "10,000", questionSet: "3", examSlots: "3" },
-];
 
 function MetaItem({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
     return (
@@ -31,6 +20,11 @@ function MetaItem({ icon: Icon, label, value }: { icon: React.ElementType; label
 }
 
 function RouteComponent() {
+    const { data, isLoading } = useQuery<AxiosResponse<Test[]>>({
+        queryKey: ["tests"],
+        queryFn: () => axios.get("/tests"),
+    });
+
     return (
         <main className="container mx-auto px-6 my-14 flex-1 flex flex-col gap-6">
             <div className="grid grid-cols-2 gap-4">
@@ -42,7 +36,11 @@ function RouteComponent() {
                     </Button>
                 </div>
             </div>
-            {!tests?.length ? (
+            {isLoading ? (
+                <div className="flex-1 p-6 flex flex-col items-center justify-center">
+                    <p className="text-muted-foreground animate-pulse">Loading tests...</p>
+                </div>
+            ) : !tests?.length ? (
                 <div className="flex-1 p-6 bg-card rounded-lg flex flex-col items-center justify-center">
                     <img src="/empty.png" alt="Empty" width={120} height={120} />
                     <h3 className="mt-5 text-xl font-semibold">No Online Test Available</h3>
@@ -52,14 +50,14 @@ function RouteComponent() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {tests.map((test) => (
+                    {tests.map((test: any) => (
                         <div key={test.id} className="p-6 bg-card border rounded-lg flex flex-col">
                             <p className="text-base font-semibold">{test.title}</p>
 
                             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                                <MetaItem icon={Users} label="Candidates" value={test.candidates} />
-                                <MetaItem icon={FileText} label="Question Set" value={test.questionSet} />
-                                <MetaItem icon={Clock} label="Exam Slots" value={test.examSlots} />
+                                <MetaItem icon={Users} label="Candidates" value={String(test.totalCandidates)} />
+                                <MetaItem icon={FileText} label="Question Set" value={String(test.questionSet)} />
+                                <MetaItem icon={Clock} label="Exam Slots" value={String(test.totalSlots)} />
                             </div>
 
                             <div className="mt-auto pt-5">
