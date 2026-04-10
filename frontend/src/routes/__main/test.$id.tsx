@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios, { type AxiosResponse } from "@/lib/axios";
 import type { Option, Test } from "@/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/__main/test/$id")({
 
 function RouteComponent() {
     const { id } = Route.useParams();
+    const { user } = Route.useRouteContext();
 
     const { data, isLoading } = useQuery<AxiosResponse<{ data: Test }>>({
         queryKey: ["test", id],
@@ -26,6 +27,8 @@ function RouteComponent() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+    const [tabSwitches, setTabSwitches] = useState(0);
+    const [fullscreenExits, setFullscreenExits] = useState(0);
 
     useEffect(() => {
         if (test && !hasStarted && timeLeft === 0) {
@@ -33,14 +36,37 @@ function RouteComponent() {
         }
     }, [test, hasStarted, timeLeft]);
 
-    const handleSubmit = useCallback(() => {
-        if (isSubmitted) return;
-        setIsSubmitted(true);
-        toast.success("Exam submitted successfully!");
-        if (document.fullscreenElement) {
-            document.exitFullscreen().catch(() => {});
-        }
-    }, [isSubmitted]);
+    const { mutate, isPending: isSubmitting } = useMutation({
+        mutationFn: (data: any) => axios.post("/attempt", data),
+        onSuccess: () => {
+            setIsSubmitted(true);
+            toast.success("Exam submitted successfully!");
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to submit exam");
+            if (error.message === "You have already submitted this test") {
+                setIsSubmitted(true);
+            }
+        },
+    });
+
+    const handleSubmit = useCallback(
+        (isAutoSubmit = false) => {
+            if (isSubmitted || isSubmitting) return;
+
+            mutate({
+                testId: id,
+                answers,
+                tabSwitches,
+                fullscreenExit: fullscreenExits,
+                isAutoSubmit,
+            });
+        },
+        [isSubmitted, isSubmitting, id, answers, tabSwitches, fullscreenExits],
+    );
 
     useEffect(() => {
         if (!hasStarted || isSubmitted || timeLeft <= 0) return;
@@ -50,7 +76,7 @@ function RouteComponent() {
                 if (prev <= 1) {
                     clearInterval(interval);
                     toast.info("Time is up! Auto-submitting the exam.");
-                    handleSubmit();
+                    handleSubmit(true);
                     return 0;
                 }
                 return prev - 1;
@@ -66,12 +92,14 @@ function RouteComponent() {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "hidden") {
                 toast.error("Warning: Tab switching detected! Activity has been recorded.");
+                setTabSwitches((prev) => prev + 1);
             }
         };
 
         const handleFullscreenChange = () => {
             if (!document.fullscreenElement) {
                 toast.error("Warning: Fullscreen exit detected! Please return to fullscreen.");
+                setFullscreenExits((prev) => prev + 1);
             }
         };
 
@@ -117,8 +145,7 @@ function RouteComponent() {
                         <img src="/success.png" alt="Success" className="w-14 h-14 mx-auto" />
                         <h3 className="text-xl font-semibold">Test Submitted</h3>
                         <p className="text-muted-foreground">
-                            Congratulations! Md. Naimur Rahman, You have completed your MCQ Exam for Probationary Officer. Thank you for
-                            participating.
+                            Congratulations! {user?.name}, You have completed your MCQ Exam for {test.title}. Thank you for participating.
                         </p>
                     </div>
                     <Button variant="outline" asChild>
@@ -254,13 +281,14 @@ function RouteComponent() {
                         <Button
                             variant="default"
                             className="bg-green-600 hover:bg-green-700"
+                            disabled={isSubmitting}
                             onClick={() => {
                                 if (window.confirm("Are you sure you want to submit the exam?")) {
-                                    handleSubmit();
+                                    handleSubmit(false);
                                 }
                             }}
                         >
-                            Submit Exam
+                            {isSubmitting ? "Submitting..." : "Submit Exam"}
                         </Button>
                     )}
                 </div>
