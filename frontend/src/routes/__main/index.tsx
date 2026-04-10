@@ -4,7 +4,7 @@ import axios, { type AxiosResponse } from "@/lib/axios";
 import type { Test } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clock, FileText, Users } from "lucide-react";
+import { CircleX, Clock, FileText, Users } from "lucide-react";
 
 export const Route = createFileRoute("/__main/")({
     component: RouteComponent,
@@ -21,6 +21,8 @@ function MetaItem({ icon: Icon, label, value }: { icon: React.ElementType; label
 }
 
 function RouteComponent() {
+    const { user } = Route.useRouteContext();
+
     const { data, isLoading } = useQuery<AxiosResponse<Test[]>>({
         queryKey: ["tests"],
         queryFn: () => axios.get("/test"),
@@ -51,25 +53,58 @@ function RouteComponent() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {data?.data?.map((test) => (
-                        <div key={test.id} className="p-6 bg-card border rounded-lg flex flex-col">
-                            <p className="text-base font-semibold">{test.title}</p>
-
-                            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                                <MetaItem icon={Users} label="Candidates" value={String(test.totalCandidates)} />
-                                <MetaItem icon={FileText} label="Question Set" value={String(test.questionSet)} />
-                                <MetaItem icon={Clock} label="Exam Slots" value={String(test.totalSlots)} />
-                            </div>
-
-                            <div className="mt-auto pt-5">
-                                <Button variant="secondary" size="sm" className="w-fit">
-                                    View Candidates
-                                </Button>
-                            </div>
-                        </div>
-                    ))}
+                    {data?.data?.map((test) => {
+                        switch (user?.role) {
+                            case "employer":
+                                return <EmployerTestCard key={test.id} test={test} />;
+                            case "candidate":
+                                return <CandidateTestCard key={test.id} test={test} />;
+                            default:
+                                return null;
+                        }
+                    })}
                 </div>
             )}
         </main>
+    );
+}
+
+function EmployerTestCard({ test }: { test: Test }) {
+    return (
+        <div key={test.id} className="p-6 bg-card border rounded-lg flex flex-col">
+            <p className="text-base font-semibold">{test.title}</p>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <MetaItem icon={Users} label="Candidates" value={String(test.totalCandidates)} />
+                <MetaItem icon={FileText} label="Question Set" value={String(test.questionSet)} />
+                <MetaItem icon={Clock} label="Exam Slots" value={String(test.totalSlots)} />
+            </div>
+
+            <div className="mt-auto pt-5">
+                <Button variant="secondary" size="sm" className="w-fit">
+                    View Candidates
+                </Button>
+            </div>
+        </div>
+    );
+}
+
+function CandidateTestCard({ test }: { test: Test }) {
+    return (
+        <div key={test.id} className="p-6 bg-card border rounded-lg flex flex-col">
+            <p className="text-base font-semibold">{test.title}</p>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <MetaItem icon={Clock} label="Duration" value={String(test.duration)} />
+                <MetaItem icon={FileText} label="Question" value={String(test.questionSet)} />
+                <MetaItem icon={CircleX} label="Negative Marking" value={`-${test.negativeMarking}/wrong`} />
+            </div>
+
+            <div className="mt-auto pt-5">
+                <Button variant="secondary" size="sm" className="w-fit">
+                    Start
+                </Button>
+            </div>
+        </div>
     );
 }

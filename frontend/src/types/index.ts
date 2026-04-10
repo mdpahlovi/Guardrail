@@ -21,6 +21,7 @@ export type Test = {
     startTime: Date;
     endTime: Date;
     duration: number;
+    negativeMarking: number;
     createdAt: Date;
     updatedAt: Date;
     createdById: string;

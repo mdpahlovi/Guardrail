@@ -7,6 +7,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { auth } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut, User } from "lucide-react";
 
@@ -24,11 +25,12 @@ export default function Navbar() {
 function AuthMenu() {
     const navigate = useNavigate();
     const { data } = auth.useSession();
+    const queryClient = useQueryClient();
 
     return data?.user ? (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon-xs">
+                <Button variant="outline" size="icon-xs" className="rounded-full">
                     <User />
                 </Button>
             </DropdownMenuTrigger>
@@ -47,6 +49,7 @@ function AuthMenu() {
                         await auth.signOut({
                             fetchOptions: {
                                 onSuccess: () => {
+                                    queryClient.clear();
                                     navigate({ to: "/signin" });
                                 },
                             },
@@ -59,7 +62,7 @@ function AuthMenu() {
             </DropdownMenuContent>
         </DropdownMenu>
     ) : (
-        <Button variant="outline" size="icon-xs" asChild>
+        <Button variant="outline" size="icon-xs" className="rounded-full" asChild>
             <Link to="/signin">
                 <LogIn />
             </Link>

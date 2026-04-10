@@ -32,9 +32,8 @@ export class TestService {
         });
     }
 
-    static async getTests(user: User) {
+    static async getTests(query: Record<string, string>, user: User) {
         return prisma.test.findMany({
-            where: { createdById: user.id },
             include: {
                 questions: {
                     include: { options: true },
