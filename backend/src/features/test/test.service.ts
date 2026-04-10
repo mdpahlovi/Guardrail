@@ -45,9 +45,9 @@ export class TestService {
         });
     }
 
-    static async deleteTest(testId: string, user: User) {
+    static async deleteTest(id: string, user: User) {
         const test = await prisma.test.findUnique({
-            where: { id: testId },
+            where: { id },
         });
 
         if (!test) {
@@ -59,7 +59,7 @@ export class TestService {
         }
 
         await prisma.test.delete({
-            where: { id: testId },
+            where: { id },
         });
 
         return test;

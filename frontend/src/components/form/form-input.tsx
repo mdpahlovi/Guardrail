@@ -10,7 +10,7 @@ type FormInputProps = {
 };
 
 export function FormInput({ type = "text", label, ...props }: FormInputProps) {
-    const field = useFieldContext<string>();
+    const field = useFieldContext<string | number>();
     const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
     return (
@@ -22,7 +22,13 @@ export function FormInput({ type = "text", label, ...props }: FormInputProps) {
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => {
+                    if (type === "number") {
+                        field.handleChange(e.target.valueAsNumber);
+                    } else {
+                        field.handleChange(e.target.value);
+                    }
+                }}
                 aria-invalid={isInvalid}
                 {...props}
             />

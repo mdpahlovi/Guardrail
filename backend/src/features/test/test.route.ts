@@ -8,6 +8,6 @@ const router = Router();
 
 router.post("/", authGuard, validate(createTestSchema), TestController.createTest);
 router.get("/", authGuard, TestController.getTests);
-router.delete("/:testId", authGuard, TestController.deleteTest);
+router.delete("/:id", authGuard, TestController.deleteTest);
 
 export const testRoutes = router;

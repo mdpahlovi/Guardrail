@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios, { type AxiosResponse } from "@/lib/axios";
+import type { Test } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, FileText, Users } from "lucide-react";
@@ -22,7 +23,7 @@ function MetaItem({ icon: Icon, label, value }: { icon: React.ElementType; label
 function RouteComponent() {
     const { data, isLoading } = useQuery<AxiosResponse<Test[]>>({
         queryKey: ["tests"],
-        queryFn: () => axios.get("/tests"),
+        queryFn: () => axios.get("/test"),
     });
 
     return (
@@ -37,10 +38,10 @@ function RouteComponent() {
                 </div>
             </div>
             {isLoading ? (
-                <div className="flex-1 p-6 flex flex-col items-center justify-center">
+                <div className="flex-1 p-6 bg-card rounded-lg flex flex-col items-center justify-center">
                     <p className="text-muted-foreground animate-pulse">Loading tests...</p>
                 </div>
-            ) : !tests?.length ? (
+            ) : !data?.data?.length ? (
                 <div className="flex-1 p-6 bg-card rounded-lg flex flex-col items-center justify-center">
                     <img src="/empty.png" alt="Empty" width={120} height={120} />
                     <h3 className="mt-5 text-xl font-semibold">No Online Test Available</h3>
@@ -50,7 +51,7 @@ function RouteComponent() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {tests.map((test: any) => (
+                    {data?.data?.map((test) => (
                         <div key={test.id} className="p-6 bg-card border rounded-lg flex flex-col">
                             <p className="text-base font-semibold">{test.title}</p>
 

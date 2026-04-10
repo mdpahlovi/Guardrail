@@ -1,27 +1,13 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_APP_SERVER;
-const baseAxios = axios.create({ baseURL: `${BASE_URL}/api/v1` });
+const baseAxios = axios.create({ baseURL: `${BASE_URL}/api`, withCredentials: true });
 
 export type ErrorResponse = { status: number; message: string };
 export type AxiosResponse<T> = { status: number; message: string; data: T; meta?: { page: number; limit: number; total: number } };
 
-baseAxios.interceptors.request.use(function (config) {
-    const token = localStorage.getItem("auth-token");
-
-    if (token) {
-        config.headers.authorization = `Bearer ${token}`;
-    }
-
-    return config;
-});
-
 baseAxios.interceptors.response.use(
     function (res) {
-        if (res.data.status === 401) {
-            localStorage.removeItem("auth-token");
-        }
-
         return res.data;
     },
     function (error) {

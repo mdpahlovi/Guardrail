@@ -3,30 +3,29 @@ import { QuestionCard } from "@/components/main/question-card";
 import { QuestionDialog } from "@/components/main/question-dialog";
 import { Button } from "@/components/ui/button";
 import { StepIndicator } from "@/components/ui/step-indicator";
+import axios from "@/lib/axios";
 import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { createTestFn } from "@/api/test";
 
 export const Route = createFileRoute("/__main/create-test")({
     component: RouteComponent,
 });
 
-// ─── Schemas ──────────────────────────────────────────────────────────────────
-
 const basicInfoSchema = z
     .object({
         title: z.string().min(1, "Test title is required"),
-        totalCandidates: z.coerce.number().int().positive("Must be positive"),
-        totalSlots: z.coerce.number().int().positive("Must be positive"),
-        questionSet: z.coerce.number().int().positive("Must be positive"),
+        totalCandidates: z.number().int().positive("Must be positive"),
+        totalSlots: z.number().int().positive("Must be positive"),
+        questionSet: z.number().int().positive("Must be positive"),
         questionType: z.enum(["mcq", "essay", "mixed"], { error: "Select a question type" }),
         startTime: z.string().min(1, "Start time is required"),
         endTime: z.string().min(1, "End time is required"),
-        duration: z.coerce.number().int().positive("Must be positive"),
+        duration: z.number().int().positive("Must be positive"),
     })
     .refine((d) => !d.startTime || !d.endTime || d.endTime > d.startTime, {
         message: "End time must be after start time",
@@ -53,8 +52,6 @@ export type Question = {
     isEditing?: boolean;
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function newQuestion(type: QuestionType): Question {
     return {
         id: crypto.randomUUID(),
@@ -67,7 +64,6 @@ function newQuestion(type: QuestionType): Question {
     };
 }
 
-// ─── Basic Info Summary ───────────────────────────────────────────────────────
 function BasicInfoSummary({ values, onEdit }: { values: BasicInfoValues; onEdit: () => void }) {
     return (
         <div className="max-w-4xl mx-auto w-full p-6 bg-card border rounded-lg flex flex-col gap-4">
@@ -98,12 +94,10 @@ function BasicInfoSummary({ values, onEdit }: { values: BasicInfoValues; onEdit:
     );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 function RouteComponent() {
     const navigate = useNavigate();
     const [step, setStep] = useState<1 | 2>(1);
-    const [savedBasicInfo, setSavedBasicInfo] = useState<BasicInfoValues | null>(null);
+    const [basicInfo, setBasicInfo] = useState<BasicInfoValues | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [dialogQuestion, setDialogQuestion] = useState<Question | null>(null);
 
@@ -120,15 +114,14 @@ function RouteComponent() {
         },
         validators: { onChange: basicInfoSchema },
         onSubmit: ({ value }) => {
-            setSavedBasicInfo(value);
+            setBasicInfo(value);
             setStep(2);
         },
     });
 
-    // Derive default type from basicInfo
     const defaultQuestionType = (): QuestionType => {
-        if (savedBasicInfo?.questionType === "mcq") return "radio";
-        if (savedBasicInfo?.questionType === "essay") return "text";
+        if (basicInfo?.questionType === "mcq") return "radio";
+        if (basicInfo?.questionType === "essay") return "text";
         return "radio";
     };
 
@@ -151,33 +144,22 @@ function RouteComponent() {
             const exists = prev.find((x) => x.id === q.id);
             return exists ? prev.map((x) => (x.id === q.id ? q : x)) : [...prev, q];
         });
-        // open a fresh dialog immediately
         setDialogQuestion(newQuestion(defaultQuestionType()));
     };
 
     const removeQuestion = (id: string) => setQuestions((prev) => prev.filter((x) => x.id !== id));
 
-    const createTestMutation = useMutation({
-        mutationFn: createTestFn,
+    const { mutate, isPending } = useMutation({
+        mutationFn: (data: any) => axios.post("/test", data),
         onSuccess: () => {
-            alert("Test saved successfully!");
+            toast.success("Test saved successfully!");
             navigate({ to: "/" });
         },
         onError: (error) => {
-            alert("Failed to save test. Please check your data.");
-            console.error("Save Test Error:", error);
+            toast.error(error.message);
         },
     });
 
-    const handleSaveTest = () => {
-        if (!savedBasicInfo) return;
-        createTestMutation.mutate({
-            ...savedBasicInfo,
-            questions,
-        });
-    };
-
-    // dialog index (for the "Question N" header)
     const dialogIndex = dialogQuestion ? questions.findIndex((q) => q.id === dialogQuestion.id) : -1;
     const dialogNumber = dialogIndex === -1 ? questions.length + 1 : dialogIndex + 1;
 
@@ -277,9 +259,9 @@ function RouteComponent() {
                 )}
 
                 {/* ── Step 2: Questions ── */}
-                {step === 2 && savedBasicInfo && (
+                {step === 2 && basicInfo && (
                     <>
-                        <BasicInfoSummary values={savedBasicInfo} onEdit={() => setStep(1)} />
+                        <BasicInfoSummary values={basicInfo} onEdit={() => setStep(1)} />
 
                         <div className="max-w-4xl mx-auto w-full flex flex-col gap-4">
                             {questions.map((q, i) => (
@@ -301,7 +283,9 @@ function RouteComponent() {
                                     <Button variant="outline" onClick={() => setStep(1)}>
                                         Back
                                     </Button>
-                                    <Button onClick={handleSaveTest}>Save Test</Button>
+                                    <Button onClick={() => mutate({ ...basicInfo, questions })} disabled={isPending}>
+                                        {isPending ? "Saving..." : "Save Test"}
+                                    </Button>
                                 </div>
                             )}
                         </div>

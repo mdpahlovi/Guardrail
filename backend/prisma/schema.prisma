@@ -1,132 +1,132 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+    provider = "prisma-client"
+    output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  role          String
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  tests         Test[]
+    id            String    @id
+    name          String
+    email         String
+    emailVerified Boolean   @default(false)
+    role          String
+    image         String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    sessions      Session[]
+    accounts      Account[]
+    tests         Test[]
 
-  @@unique([email])
-  @@map("user")
+    @@unique([email])
+    @@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id        String   @id
+    expiresAt DateTime
+    token     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
-  @@index([userId])
-  @@map("session")
+    @@unique([token])
+    @@index([userId])
+    @@map("session")
 }
 
 model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
 
-  @@index([userId])
-  @@map("account")
+    @@index([userId])
+    @@map("account")
 }
 
 model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+    id         String   @id
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
-  @@index([identifier])
-  @@map("verification")
+    @@index([identifier])
+    @@map("verification")
 }
 
 enum QuestionType {
-  mcq
-  essay
-  mixed
+    mcq
+    essay
+    mixed
 }
 
 model Test {
-  id              String       @id @default(cuid())
-  title           String
-  totalCandidates Int
-  totalSlots      Int
-  questionSet     Int
-  questionType    QuestionType
-  startTime       DateTime
-  endTime         DateTime
-  duration        Int
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  createdById     String
-  createdBy       User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  questions       Question[]
+    id              String       @id @default(cuid())
+    title           String
+    totalCandidates Int
+    totalSlots      Int
+    questionSet     Int
+    questionType    QuestionType
+    startTime       DateTime
+    endTime         DateTime
+    duration        Int
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
+    createdById     String
+    createdBy       User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+    questions       Question[]
 
-  @@index([createdById])
-  @@map("test")
+    @@index([createdById])
+    @@map("test")
 }
 
 enum QuestionInputType {
-  text
-  radio
-  checkbox
+    text
+    radio
+    checkbox
 }
 
 model Question {
-  id             String            @id @default(cuid())
-  type           QuestionInputType
-  marks          Int               @default(1)
-  questionText   String
-  answerText     String            @default("")
-  correctAnswers String[]
-  order          Int               @default(0)
-  testId         String
-  test           Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
-  options        Option[]
+    id             String            @id @default(cuid())
+    type           QuestionInputType
+    marks          Int               @default(1)
+    questionText   String
+    answerText     String            @default("")
+    correctAnswers String[]
+    order          Int               @default(0)
+    testId         String
+    test           Test              @relation(fields: [testId], references: [id], onDelete: Cascade)
+    options        Option[]
 
-  @@index([testId])
-  @@map("question")
+    @@index([testId])
+    @@map("question")
 }
 
 model Option {
-  id         String   @id @default(cuid())
-  text       String
-  order      Int      @default(0)
-  questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    id         String   @id @default(cuid())
+    text       String
+    order      Int      @default(0)
+    questionId String
+    question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  @@index([questionId])
-  @@map("option")
+    @@index([questionId])
+    @@map("option")
 }
