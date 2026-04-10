@@ -18,7 +18,7 @@ const signupSchema = z.object({
 function RouteComponent() {
     return (
         <div className="w-full max-w-xl mx-auto my-14 p-6 bg-card border rounded-lg">
-            <h1 className="text-2xl text-center font-semibold">Sign Up</h1>
+            <h2 className="text-2xl text-center font-semibold">Sign Up</h2>
             <Tabs defaultValue="employer" className="mt-6">
                 <TabsList>
                     <TabsTrigger value="employer">Employer</TabsTrigger>
