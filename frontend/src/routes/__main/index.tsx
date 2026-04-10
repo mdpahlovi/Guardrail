@@ -81,8 +81,10 @@ function EmployerTestCard({ test }: { test: Test }) {
             </div>
 
             <div className="mt-auto pt-5">
-                <Button variant="secondary" size="sm" className="w-fit">
-                    View Candidates
+                <Button variant="secondary" size="sm" className="w-fit" asChild>
+                    <Link to="/candidates/$id" params={{ id: test.id }}>
+                        View Candidates
+                    </Link>
                 </Button>
             </div>
         </div>
@@ -101,8 +103,10 @@ function CandidateTestCard({ test }: { test: Test }) {
             </div>
 
             <div className="mt-auto pt-5">
-                <Button variant="secondary" size="sm" className="w-fit">
-                    Start
+                <Button variant="secondary" size="sm" className="w-fit" asChild>
+                    <Link to="/test/$id" params={{ id: test.id }}>
+                        Start
+                    </Link>
                 </Button>
             </div>
         </div>

@@ -55,7 +55,7 @@ export function QuestionDialog({
             <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
             {/* Dialog */}
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                <div className="bg-card border rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
+                <div className="bg-card border rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
                     {/* Header */}
                     <div className="flex items-center gap-3 px-6 py-4 border-b">
                         <span className="size-6 border rounded-full flex items-center justify-center">{questionNumber}</span>

@@ -15,6 +15,8 @@ import { Route as _mainIndexRouteImport } from './routes/__main/index'
 import { Route as _mainCreateTestRouteImport } from './routes/__main/create-test'
 import { Route as _authSignupRouteImport } from './routes/__auth/signup'
 import { Route as _authSigninRouteImport } from './routes/__auth/signin'
+import { Route as _mainTestIdRouteImport } from './routes/__main/test.$id'
+import { Route as _mainCandidatesIdRouteImport } from './routes/__main/candidates.$id'
 
 const _mainRouteRoute = _mainRouteRouteImport.update({
   id: '/__main',
@@ -44,18 +46,32 @@ const _authSigninRoute = _authSigninRouteImport.update({
   path: '/signin',
   getParentRoute: () => _authRouteRoute,
 } as any)
+const _mainTestIdRoute = _mainTestIdRouteImport.update({
+  id: '/test/$id',
+  path: '/test/$id',
+  getParentRoute: () => _mainRouteRoute,
+} as any)
+const _mainCandidatesIdRoute = _mainCandidatesIdRouteImport.update({
+  id: '/candidates/$id',
+  path: '/candidates/$id',
+  getParentRoute: () => _mainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof _mainIndexRoute
   '/signin': typeof _authSigninRoute
   '/signup': typeof _authSignupRoute
   '/create-test': typeof _mainCreateTestRoute
+  '/candidates/$id': typeof _mainCandidatesIdRoute
+  '/test/$id': typeof _mainTestIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof _mainIndexRoute
   '/signin': typeof _authSigninRoute
   '/signup': typeof _authSignupRoute
   '/create-test': typeof _mainCreateTestRoute
+  '/candidates/$id': typeof _mainCandidatesIdRoute
+  '/test/$id': typeof _mainTestIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -65,12 +81,26 @@ export interface FileRoutesById {
   '/__auth/signup': typeof _authSignupRoute
   '/__main/create-test': typeof _mainCreateTestRoute
   '/__main/': typeof _mainIndexRoute
+  '/__main/candidates/$id': typeof _mainCandidatesIdRoute
+  '/__main/test/$id': typeof _mainTestIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/signin' | '/signup' | '/create-test'
+  fullPaths:
+    | '/'
+    | '/signin'
+    | '/signup'
+    | '/create-test'
+    | '/candidates/$id'
+    | '/test/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signin' | '/signup' | '/create-test'
+  to:
+    | '/'
+    | '/signin'
+    | '/signup'
+    | '/create-test'
+    | '/candidates/$id'
+    | '/test/$id'
   id:
     | '__root__'
     | '/__auth'
@@ -79,6 +109,8 @@ export interface FileRouteTypes {
     | '/__auth/signup'
     | '/__main/create-test'
     | '/__main/'
+    | '/__main/candidates/$id'
+    | '/__main/test/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,6 +162,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _authSigninRouteImport
       parentRoute: typeof _authRouteRoute
     }
+    '/__main/test/$id': {
+      id: '/__main/test/$id'
+      path: '/test/$id'
+      fullPath: '/test/$id'
+      preLoaderRoute: typeof _mainTestIdRouteImport
+      parentRoute: typeof _mainRouteRoute
+    }
+    '/__main/candidates/$id': {
+      id: '/__main/candidates/$id'
+      path: '/candidates/$id'
+      fullPath: '/candidates/$id'
+      preLoaderRoute: typeof _mainCandidatesIdRouteImport
+      parentRoute: typeof _mainRouteRoute
+    }
   }
 }
 
@@ -150,11 +196,15 @@ const _authRouteRouteWithChildren = _authRouteRoute._addFileChildren(
 interface _mainRouteRouteChildren {
   _mainCreateTestRoute: typeof _mainCreateTestRoute
   _mainIndexRoute: typeof _mainIndexRoute
+  _mainCandidatesIdRoute: typeof _mainCandidatesIdRoute
+  _mainTestIdRoute: typeof _mainTestIdRoute
 }
 
 const _mainRouteRouteChildren: _mainRouteRouteChildren = {
   _mainCreateTestRoute: _mainCreateTestRoute,
   _mainIndexRoute: _mainIndexRoute,
+  _mainCandidatesIdRoute: _mainCandidatesIdRoute,
+  _mainTestIdRoute: _mainTestIdRoute,
 }
 
 const _mainRouteRouteWithChildren = _mainRouteRoute._addFileChildren(

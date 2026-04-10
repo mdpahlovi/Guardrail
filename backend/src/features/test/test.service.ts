@@ -34,14 +34,26 @@ export class TestService {
 
     static async getTests(query: Record<string, string>, user: User) {
         return prisma.test.findMany({
+            orderBy: { createdAt: "desc" },
+        });
+    }
+
+    static async getTest(id: string, user: User) {
+        const test = await prisma.test.findUnique({
+            where: { id },
             include: {
                 questions: {
                     include: { options: true },
                     orderBy: { order: "asc" },
                 },
             },
-            orderBy: { createdAt: "desc" },
         });
+
+        if (!test) {
+            throw ApiError.notFound("Test not found");
+        }
+
+        return test;
     }
 
     static async deleteTest(id: string, user: User) {
