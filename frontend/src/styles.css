@@ -59,7 +59,7 @@
     --secondary: rgb(19, 11, 44);
     --secondary-foreground: rgb(0, 0, 0);
     --muted: rgb(245, 246, 250);
-    --muted-foreground: rgb(75, 75, 75);
+    --muted-foreground: rgb(100, 116, 139);
     --accent: rgb(245, 245, 220);
     --accent-foreground: rgb(0, 0, 0);
     --destructive: rgb(239, 68, 68);
@@ -120,6 +120,6 @@
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-muted text-foreground h-dvh flex flex-col;
+        @apply bg-muted text-foreground;
     }
 }
