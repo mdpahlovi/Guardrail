@@ -5,22 +5,22 @@ import { TestService } from "./test.service";
 
 export class TestController {
     static createTest = asyncHandler(async (req: Request, res: Response) => {
-        const test = await TestService.createTest(req.body, req.user);
+        const test = await TestService.createTest(req.body, req.user!);
         ApiResponse.created(res, test, "Test created successfully");
     });
 
     static getTests = asyncHandler(async (req: Request, res: Response) => {
-        const tests = await TestService.getTests(req.query, req.user);
+        const tests = await TestService.getTests(req.query, req.user!);
         ApiResponse.success(res, tests, "Tests fetched successfully");
     });
 
     static getTest = asyncHandler(async (req: Request, res: Response) => {
-        const test = await TestService.getTest(req.params.id as string, req.user);
+        const test = await TestService.getTest(req.params.id as string, req.user!);
         ApiResponse.success(res, test, "Test fetched successfully");
     });
 
     static deleteTest = asyncHandler(async (req: Request, res: Response) => {
-        const test = await TestService.deleteTest(req.params.id as string, req.user);
+        const test = await TestService.deleteTest(req.params.id as string, req.user!);
         ApiResponse.success(res, test, "Test deleted successfully");
     });
 }

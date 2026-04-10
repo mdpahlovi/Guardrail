@@ -1,21 +1,17 @@
 import { prisma } from "@/utils/prisma";
+import { User } from "better-auth";
+import { z } from "zod";
+import { submitAttemptSchema } from "./attempt.validate";
 
 export class AttemptService {
-    async submitAttempt(data: {
-        userId: string;
-        testId: string;
-        answers: Record<string, string | string[]>;
-        tabSwitches: number;
-        fullscreenExit: number;
-        isAutoSubmit: boolean;
-    }) {
-        const { userId, testId, answers, tabSwitches, fullscreenExit, isAutoSubmit } = data;
+    static async submitAttempt(data: z.infer<typeof submitAttemptSchema>["body"], user: User) {
+        const { testId, answers, tabSwitches, fullscreenExit, isAutoSubmit } = data;
 
         const existingAttempt = await prisma.testAttempt.findUnique({
             where: {
                 testId_userId: {
                     testId,
-                    userId,
+                    userId: user.id,
                 },
             },
         });
@@ -66,7 +62,7 @@ export class AttemptService {
 
         const attempt = await prisma.testAttempt.create({
             data: {
-                userId,
+                userId: user.id,
                 testId,
                 tabSwitches,
                 fullscreenExit,

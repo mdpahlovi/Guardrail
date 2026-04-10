@@ -12,14 +12,10 @@ export const config = {
 
     // CORS
     corsOrigin: process.env.CORS_ORIGIN!,
-
-    // Email
-    emailUser: process.env.EMAIL_USER!,
-    emailPass: process.env.EMAIL_PASS!,
 } as const;
 
 // Validate required environment variables
-const requiredEnvVars = ["DATABASE_URL", "CORS_ORIGIN", "EMAIL_USER", "EMAIL_PASS"];
+const requiredEnvVars = ["DATABASE_URL", "CORS_ORIGIN"];
 
 export const validate = (): void => {
     const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);

@@ -3,7 +3,7 @@ import { errorHandler, notFoundHandler } from "@/middleware/error.middleware";
 import cors from "cors";
 import express, { Application } from "express";
 import helmet from "helmet";
-import { apiRoutes } from "./routes";
+import { apiRoutes } from "./route";
 
 const app: Application = express();
 

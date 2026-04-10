@@ -1,6 +1,15 @@
 import { ApiError } from "@/utils/ApiError";
 import { auth } from "@/utils/auth";
+import { User } from "better-auth";
 import { NextFunction, Request, Response } from "express";
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: User;
+        }
+    }
+}
 
 export const authGuard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -9,7 +18,7 @@ export const authGuard = async (req: Request, res: Response, next: NextFunction)
             throw ApiError.unauthorized();
         }
 
-        (req as Request & { user: typeof session.user }).user = session.user;
+        req.user = session.user;
         next();
     } catch (error) {
         next(error instanceof ApiError ? error : ApiError.unauthorized());

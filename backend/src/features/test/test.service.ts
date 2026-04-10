@@ -32,7 +32,7 @@ export class TestService {
         });
     }
 
-    static async getTests(query: Record<string, string>, user: User) {
+    static async getTests(query: any, user: User) {
         return prisma.test.findMany({
             orderBy: { createdAt: "desc" },
         });
