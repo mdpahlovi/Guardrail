@@ -268,7 +268,17 @@ function RouteComponent() {
 
                 <div className="flex flex-wrap items-center justify-between gap-4 mt-auto">
                     {currentIndex < test.questions.length - 1 ? (
-                        <Button variant="outline" onClick={() => setCurrentIndex((p) => p + 1)}>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setAnswers((prev) => {
+                                    const updated = { ...prev };
+                                    delete updated[currentQuestion.id];
+                                    return updated;
+                                });
+                                setCurrentIndex((p) => p + 1);
+                            }}
+                        >
                             Skip this Question
                         </Button>
                     ) : (
