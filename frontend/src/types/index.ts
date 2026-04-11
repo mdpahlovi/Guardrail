@@ -7,8 +7,9 @@ export enum QuestionInputType {
 }
 
 export enum QuestionType {
-    Standard = "Standard",
-    Adaptive = "Adaptive",
+    mcq = "mcq",
+    essay = "essay",
+    mixed = "mixed",
 }
 
 export type Test = {
@@ -18,15 +19,16 @@ export type Test = {
     totalSlots: number;
     questionSet: number;
     questionType: QuestionType;
-    startTime: Date;
-    endTime: Date;
+    startTime: string;
+    endTime: string;
     duration: number;
     negativeMarking: number;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     createdById: string;
-    createdBy?: User; // Optional unless fetched via include
-    questions?: Question[]; // Optional unless fetched via include
+    createdBy?: User;
+    questions?: Question[];
+    attempts?: TestAttempt[];
 };
 
 export type Question = {
@@ -40,6 +42,7 @@ export type Question = {
     testId: string;
     test?: Test;
     options?: Option[];
+    answers?: Answer[];
 };
 
 export type Option = {
@@ -47,5 +50,29 @@ export type Option = {
     text: string;
     order: number;
     questionId: string;
+    question?: Question;
+};
+
+export type TestAttempt = {
+    id: string;
+    testId: string;
+    userId: string;
+    startedAt: string;
+    submittedAt: string | null;
+    isAutoSubmit: boolean;
+    tabSwitches: number;
+    fullscreenExit: number;
+    test?: Test;
+    user?: User;
+    answers?: Answer[];
+};
+
+export type Answer = {
+    id: string;
+    attemptId: string;
+    questionId: string;
+    textAnswer: string | null;
+    chosen: string[];
+    attempt?: TestAttempt;
     question?: Question;
 };

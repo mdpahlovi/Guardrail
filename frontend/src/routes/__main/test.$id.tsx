@@ -282,11 +282,7 @@ function RouteComponent() {
                             variant="default"
                             className="bg-green-600 hover:bg-green-700"
                             disabled={isSubmitting}
-                            onClick={() => {
-                                if (window.confirm("Are you sure you want to submit the exam?")) {
-                                    handleSubmit(false);
-                                }
-                            }}
+                            onClick={() => handleSubmit(false)}
                         >
                             {isSubmitting ? "Submitting..." : "Submit Exam"}
                         </Button>

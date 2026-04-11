@@ -9,6 +9,7 @@ const router = Router();
 router.post("/", authGuard, validate(createTestSchema), TestController.createTest);
 router.get("/", authGuard, TestController.getTests);
 router.get("/:id", authGuard, TestController.getTest);
+router.get("/:id/candidates", authGuard, TestController.getTestCandidates);
 router.delete("/:id", authGuard, TestController.deleteTest);
 
 export const testRoutes = router;

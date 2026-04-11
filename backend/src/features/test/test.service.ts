@@ -34,6 +34,13 @@ export class TestService {
 
     static async getTests(query: any, user: User) {
         return prisma.test.findMany({
+            include: {
+                attempts: {
+                    where: {
+                        userId: user.id,
+                    },
+                },
+            },
             orderBy: { createdAt: "desc" },
         });
     }
@@ -54,6 +61,30 @@ export class TestService {
         }
 
         return test;
+    }
+
+    static async getTestCandidates(id: string, user: User) {
+        const test = await prisma.test.findUnique({
+            where: { id },
+        });
+
+        if (!test) {
+            throw ApiError.notFound("Test not found");
+        }
+
+        const attempts = await prisma.testAttempt.findMany({
+            where: { testId: id },
+            include: {
+                user: true,
+                answers: true,
+            },
+            orderBy: { startedAt: "desc" },
+        });
+
+        return {
+            test,
+            attempts,
+        };
     }
 
     static async deleteTest(id: string, user: User) {

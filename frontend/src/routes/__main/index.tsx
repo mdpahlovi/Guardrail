@@ -34,9 +34,11 @@ function RouteComponent() {
                 <h2 className="text-2xl font-semibold">Online Tests</h2>
                 <div className="flex gap-4">
                     <Input placeholder="Search by exam title" className="border-primary shadow-lg" />
-                    <Button asChild>
-                        <Link to="/create-test">Create Online Test</Link>
-                    </Button>
+                    {user?.role === "employer" ? (
+                        <Button asChild>
+                            <Link to="/create-test">Create Online Test</Link>
+                        </Button>
+                    ) : null}
                 </div>
             </div>
             {isLoading ? (
@@ -103,9 +105,9 @@ function CandidateTestCard({ test }: { test: Test }) {
             </div>
 
             <div className="mt-auto pt-5">
-                <Button variant="secondary" size="sm" className="w-fit" asChild>
+                <Button variant="secondary" size="sm" className="w-fit" disabled={!!test?.attempts?.length} asChild>
                     <Link to="/test/$id" params={{ id: test.id }}>
-                        Start
+                        {test?.attempts?.length ? "Attempted" : "Start"}
                     </Link>
                 </Button>
             </div>

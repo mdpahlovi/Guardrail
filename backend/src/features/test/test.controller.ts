@@ -19,6 +19,11 @@ export class TestController {
         ApiResponse.success(res, test, "Test fetched successfully");
     });
 
+    static getTestCandidates = asyncHandler(async (req: Request, res: Response) => {
+        const data = await TestService.getTestCandidates(req.params.id as string, req.user!);
+        ApiResponse.success(res, data, "Candidates fetched successfully");
+    });
+
     static deleteTest = asyncHandler(async (req: Request, res: Response) => {
         const test = await TestService.deleteTest(req.params.id as string, req.user!);
         ApiResponse.success(res, test, "Test deleted successfully");
